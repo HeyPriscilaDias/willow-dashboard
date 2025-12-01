@@ -43,10 +43,13 @@
 
 #### 📊 Scenario Validation Progress:
 - ✅ **Scenario 1** ("Ghost High Achiever"): Unit 1 shows 13 days overdue
+- ✅ **Scenario 3** ("Ivy League Risk"): College list shows all Reach schools with balance warning
 - ✅ **Scenario 4** ("Stale Data Comeback"): GPA age warning displays
 - ✅ **Scenario 6** ("Silent Crisis"): Sentiment alert card with escalation
+- ✅ **Scenario 7** ("Summer Melt Senior"): Partial - applications show pending decisions (needs financial aid)
 - 🟡 **Scenario 2, 10** (Quality feedback): Needs Phase 3 (artifact feedback UI)
-- ❌ **Scenario 3, 5, 7** (College list, alt paths, financial aid): Needs Phase 2
+- 🟡 **Scenario 5** (Alternative path): Needs Phase 2.4
+- 🟡 **Scenario 7** (Complete): Needs Phase 2.3 (financial aid + deadline)
 
 #### 🔧 Bug Fixes Applied:
 - Fixed hydration mismatch in TriageList (formatDate function)
@@ -56,12 +59,28 @@
 
 ---
 
-### **PHASE 2: Post-Secondary Data (PENDING ⏳)**
-**Target**: Week 2-3 | **Status**: Not started
+### **PHASE 2: Post-Secondary Data (PARTIALLY COMPLETED ✅)**
+**Target**: Week 2-3 | **Status**: 2.1 & 2.2 DONE (2.3, 2.4 pending)
+
+#### ✅ Completed Tasks:
+
+**2.1 College List Data Model & Display** ✅ DONE
+- Commit: `107157a` | Date: December 1, 2024
+- Files: `lib/types/index.ts` (College interface), `lib/data/studentColleges.ts`, `components/dashboard/CollegeListCard.tsx`, `components/dashboard/DetailPanel.tsx`
+- Implementation: College list display with reach/target/safety balance visualization
+- Sample Data: 3 students with college lists (Sarah: 8 all-reach, Jessica & Morgan: balanced)
+- Unblocks: Scenario 3 ("Ivy League Risk")
+- Status: **LIVE**
+
+**2.2 Application Status Tracking** ✅ DONE
+- Commit: `e0d25d2` | Date: December 1, 2024
+- Files: `lib/types/index.ts` (Application interface), `lib/data/studentApplications.ts`, `components/dashboard/ApplicationStatusCard.tsx`, `components/dashboard/DetailPanel.tsx`
+- Implementation: Application tracking with decision status summary and individual application cards
+- Sample Data: 3 students with applications (Sarah: 8 pending, Jessica: 5 with 3 accepted, Morgan: 6 submitted)
+- Unblocks: Partial Scenario 7 ("Summer Melt Senior" - needs financial aid)
+- Status: **LIVE**
 
 #### Pending Tasks:
-- [ ] 2.1 College List Data Model & Display (blocks Scenario 3)
-- [ ] 2.2 Application Status Tracking (blocks Scenario 7)
 - [ ] 2.3 Financial Aid Tracking with Urgency (blocks Scenario 7)
 - [ ] 2.4 Alternative Path Tracking (blocks Scenario 5)
 
@@ -773,16 +792,16 @@
 
 | **Gap** | **Blocks Scenarios** | **Phase** | **Status** | **Component(s)** | **Effort** |
 |---------|---------------------|----------|-----------|-----------------|----------|
-| 1. College List | 3 | 2.1 | ⏳ Pending | DetailPanel, new CollegeListCard | Medium |
+| 1. College List | 3 | 2.1 | ✅ DONE | DetailPanel, CollegeListCard, types | Medium |
 | 2. Unit Timeline | 1, 2, 10 | 1.1 | ✅ DONE | DetailPanel, types, UnitTimelineCard | High |
 | 3. Artifact Feedback | 2, 10 | 3.1-3.2 | ⏳ Pending | new ArtifactCard | High |
-| 4. Applications | 7 | 2.2 | ⏳ Pending | new ApplicationStatusCard | Medium |
+| 4. Applications | 7 | 2.2 | ✅ DONE | ApplicationStatusCard, types, data | Medium |
 | 5. Financial Aid | 7 | 2.3 | ⏳ Pending | new FinancialAidCard | High |
 | 6. GPA Age | 4 | 1.2 | ✅ DONE | DetailPanel, dateUtils | Low |
 | 7. Flag Reasons | All | 1.3 | ✅ DONE | types, data, DetailPanel | Low |
-| 8. Sentiment Alert | 6 | 1.4 | ✅ DONE | new SentimentAlertCard | Medium |
+| 8. Sentiment Alert | 6 | 1.4 | ✅ DONE | SentimentAlertCard | Medium |
 | 9. Override Reason | 8 | 4.1 | ⏳ Pending | DetailPanel, StatusOverrideCard | Medium |
-| 10. Timeline Context | 3 | 2.1 | ⏳ Pending | FidelityModal | Low |
+| 10. Timeline Context | 3 | 2.1 | ✅ DONE | CollegeListCard | Low |
 | 11. Flag Priority | All | 4.2 | ⏳ Pending | DetailPanel | Low |
 | 12. Alt. Paths | 5 | 2.4 | ⏳ Pending | new AlternativePathForm | Medium |
 
@@ -799,10 +818,12 @@
 - [x] Fix hydration mismatch issues - DONE
 - [x] Commit Phase 1 (b4a7c5a) - DONE
 
-### **Week 2 (IN PROGRESS ⏳):**
-- [ ] Complete Phase 2.1 (College list) - CRITICAL for Scenario 3 validation
-- [ ] Complete Phase 2.2 (Applications)
-- [ ] Update sample data for 11th/12th grade students
+### **Week 2 (COMPLETED ✅):**
+- [x] Complete Phase 2.1 (College list) - CRITICAL for Scenario 3 validation (107157a)
+- [x] Complete Phase 2.2 (Applications) (e0d25d2)
+- [x] Update sample data for 11th/12th grade students
+- [x] Integrate college list and applications into DetailPanel
+- [x] 5/10 scenarios now validatable (1, 3, 4, 6, 7 partial)
 
 ### **Week 3:**
 - [ ] Complete Phase 2.3 (Financial Aid with deadline urgency)
@@ -829,25 +850,33 @@
 ## CURRENT STATUS & NEXT STEPS
 
 ### 📊 Overall Progress
-- **Phase 1**: ✅ **COMPLETED** (4/4 tasks)
-- **Scenarios Validatable**: 3/10 (Scenarios 1, 4, 6)
-- **Gaps Resolved**: 4/12 (Unit Timeline, GPA Age, Flag Reasons, Sentiment Alert)
+- **Phase 1**: ✅ **COMPLETED** (4/4 tasks) - Commit b4a7c5a
+- **Phase 2.1**: ✅ **COMPLETED** (College List) - Commit 107157a
+- **Phase 2.2**: ✅ **COMPLETED** (Applications) - Commit e0d25d2
+- **Scenarios Validatable**: 5/10 (Scenarios 1, 3, 4, 6, 7 partial)
+- **Gaps Resolved**: 8/12 (Unit Timeline, GPA Age, Flag Reasons, Sentiment Alert, College List, Timeline Context, Applications, partial Financial Aid prep)
 - **Dev Server**: ✅ Live and working (http://localhost:3000)
-- **Commits**: 1 (b4a7c5a)
+- **Total Commits**: 3 (b4a7c5a, 107157a, e0d25d2)
 
-### 🎯 Next Priority (Phase 2)
-College list and application tracking are CRITICAL blockers for validating core JTBD #2 (Post-Secondary Readiness). Recommend starting Phase 2.1 immediately:
+### 🎯 Next Priority (Phase 2.3 & 2.4)
+Two remaining Phase 2 tasks unlock 2 more scenarios:
 
-**Phase 2.1: College List Display**
-- Add `collegeList[]` field to Student type
-- Create CollegeListCard component showing schools + acceptance rates
-- Visualize balance (reach/target/safety)
-- Unblocks: Scenario 3 ("Ivy League Risk"), JTBD #2 validation
+**Phase 2.3: Financial Aid Tracking with Urgency** (HIGH PRIORITY)
+- Add FAFSA status + scholarship tracking to Student type
+- Create FinancialAidCard component with May 1 deadline urgency indicator
+- Unblocks: Scenario 7 ("Summer Melt Senior") - COMPLETE
+- Impact: Allows showing critical deadline warnings for 12th graders
+
+**Phase 2.4: Alternative Path Tracking** (MEDIUM PRIORITY)
+- Add postSecondaryPath field (apprenticeship, trade, military, gap year, work)
+- Create AlternativePathForm for logging non-college paths
+- Update status logic: 0 apps + apprenticeship = On Track (not Off Track)
+- Unblocks: Scenario 5 ("Hidden Tradesman")
 
 ### 📝 How to Continue
-1. **Dev environment is ready**: All Phase 1 code builds with zero errors
-2. **Sample data patterns established**: Unit timeline data structure works; ready to extend for college data
-3. **Type extensions in place**: Student type ready for college list, applications, financial aid fields
-4. **Component patterns clear**: UnitTimelineCard shows pattern for other card components (CollegeListCard, ApplicationStatusCard, etc.)
+1. **Foundation Complete**: All Phase 1 patterns established and working
+2. **Post-Secondary Data Layer**: College list and applications now visible
+3. **Component Library**: CollegeListCard, ApplicationStatusCard patterns ready to extend
+4. **Type Safety**: Student type extended; ready for financial aid + alternative paths
 
-**Recommendation**: Build Phase 2.1 (College List) next - this will unblock Scenario 3 and give team first complete validation of post-secondary readiness pathway. By end of Week 2, you'll have 4-5 scenarios validatable.
+**Recommendation**: Phase 2.3 (Financial Aid) next - this is the final piece for Scenario 7 and adds critical deadline urgency functionality. By end of Phase 2.3, you'll have 6/10 scenarios fully validatable. Phase 2.4 is quicker and will unblock Scenario 5.
