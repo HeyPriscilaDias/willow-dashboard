@@ -125,9 +125,23 @@ export function DashboardContent() {
     }
   };
 
-  const handleSubmitGrade = (grade: string, feedback: string) => {
-    alert(`Grade submitted for ${selectedStudent?.name}: ${grade.toUpperCase()}\n\nFeedback recorded.`);
+  const handleApproveArtifact = () => {
+    alert(`Artifact approved for ${selectedStudent?.name}`);
     setSelectedStudent(null);
+  };
+
+  const handleFlagArtifactRevision = (reason: string) => {
+    if (selectedStudent) {
+      setStudents(
+        students.map((s) =>
+          s.id === selectedStudent.id
+            ? { ...s, flags: [...s.flags, 'revision'] }
+            : s
+        )
+      );
+      alert(`Artifact flagged for revision for ${selectedStudent.name}:\n\n"${reason}"`);
+      setSelectedStudent(null);
+    }
   };
 
   const handleSaveAdminNote = (note: string) => {
@@ -167,7 +181,8 @@ export function DashboardContent() {
         onClose={() => setSelectedStudent(null)}
         onAddFlag={handleAddFlag}
         onOverrideStatus={handleOverrideStatus}
-        onSubmitGrade={handleSubmitGrade}
+        onApproveArtifact={handleApproveArtifact}
+        onFlagArtifactRevision={handleFlagArtifactRevision}
         onSaveAdminNote={handleSaveAdminNote}
         onEscalate={handleEscalate}
       />

@@ -29,6 +29,9 @@ import { SentimentAlertCard } from '@/components/dashboard/SentimentAlertCard';
 import { CollegeListCard } from '@/components/dashboard/CollegeListCard';
 import { ApplicationStatusCard } from '@/components/dashboard/ApplicationStatusCard';
 import { FinancialAidCard } from '@/components/dashboard/FinancialAidCard';
+import { AlternativePathCard } from '@/components/dashboard/AlternativePathCard';
+import { StatusOverrideModal } from '@/components/dashboard/StatusOverrideModal';
+import { StatusOverrideCard } from '@/components/dashboard/StatusOverrideCard';
 
 interface DetailPanelProps {
   student: Student | null;
@@ -36,7 +39,8 @@ interface DetailPanelProps {
   onClose: () => void;
   onAddFlag?: (note: string) => void;
   onOverrideStatus?: (reason: string) => void;
-  onSubmitGrade?: (grade: string, feedback: string) => void;
+  onApproveArtifact?: () => void;
+  onFlagArtifactRevision?: (reason: string) => void;
   onSaveAdminNote?: (note: string) => void;
   onEscalate?: (counselor: string) => void;
 }
@@ -47,17 +51,18 @@ export function DetailPanel({
   onClose,
   onAddFlag,
   onOverrideStatus,
-  onSubmitGrade,
+  onApproveArtifact,
+  onFlagArtifactRevision,
   onSaveAdminNote,
   onEscalate,
 }: DetailPanelProps) {
   const { role } = useRole();
   const [flagNote, setFlagNote] = useState('');
-  const [gradeValue, setGradeValue] = useState('');
-  const [feedback, setFeedback] = useState('');
+  const [revisionReason, setRevisionReason] = useState('');
   const [adminNote, setAdminNote] = useState('');
   const [escalateCounselor, setEscalateCounselor] = useState('');
   const [isMounted, setIsMounted] = useState(false);
+  const [showOverrideModal, setShowOverrideModal] = useState(false);
 
   // Only render date-dependent content after client mount
   useEffect(() => {
@@ -74,17 +79,40 @@ export function DetailPanel({
   };
 
   const handleOverride = () => {
-    const reason = prompt('Provide reason for status override:');
-    if (reason) {
-      onOverrideStatus?.(reason);
-    }
+    setShowOverrideModal(true);
   };
 
-  const handleSubmitGrade = () => {
-    if (gradeValue && feedback.trim()) {
-      onSubmitGrade?.(gradeValue, feedback);
-      setGradeValue('');
-      setFeedback('');
+  const handleOverrideConfirm = (reason: string) => {
+    onOverrideStatus?.(reason);
+  };
+
+  // Sort flags by priority: Sentiment > Deadline > Action > Informational
+  const getSortedFlags = (flags: string[]) => {
+    const priority: Record<string, number> = {
+      'sentiment': 0,  // Safety concern (highest priority)
+      'deadline': 1,   // Time-critical
+      'revision': 2,   // Needs action
+      'strategy': 2,   // Needs action
+      'academic': 3,   // Informational
+      'staff': 3       // Informational
+    };
+
+    return [...flags].sort((a, b) => {
+      const priorityA = priority[a] ?? 99;
+      const priorityB = priority[b] ?? 99;
+      return priorityA - priorityB;
+    });
+  };
+
+  const handleApproveArtifact = () => {
+    onApproveArtifact?.();
+    setRevisionReason('');
+  };
+
+  const handleFlagArtifactRevision = () => {
+    if (revisionReason.trim()) {
+      onFlagArtifactRevision?.(revisionReason);
+      setRevisionReason('');
     }
   };
 
@@ -104,7 +132,7 @@ export function DetailPanel({
 
   return (
     <Dialog open={student !== null} onOpenChange={onClose}>
-      <DialogContent suppressHydrationWarning className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent suppressHydrationWarning className="max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto p-6">
         <DialogHeader>
           <div className="mb-4">
             <DialogTitle className="text-2xl font-bold text-gray-900">
@@ -124,7 +152,8 @@ export function DetailPanel({
           </div>
         </DialogHeader>
 
-        <div className="space-y-6">
+        {/* Top Section: Status + Override */}
+        <div className="space-y-4">
           {/* Status Logic / Grade Info */}
           <div>
             <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-600">
@@ -141,120 +170,154 @@ export function DetailPanel({
             </Card>
           </div>
 
-          {/* Ghost Insight Card */}
-          {student && curriculumStatus && (
-            <GhostInsightCard student={student} curriculumStatus={curriculumStatus} />
-          )}
-
-          {/* Unit Timeline */}
-          {student && (
-            <UnitTimelineCard units={getStudentUnits(student.id)} />
-          )}
-
-          {/* College List (for 11th/12th graders) */}
-          {student && (student.grade === 11 || student.grade === 12) && student.collegeList && (
-            <CollegeListCard colleges={student.collegeList} />
-          )}
-
-          {/* Application Status (for 12th graders) */}
-          {student && student.grade === 12 && student.applications && (
-            <ApplicationStatusCard applications={student.applications} />
-          )}
-
-          {/* Financial Aid Status (for 12th graders) */}
-          {student && student.grade === 12 && (
-            <FinancialAidCard
-              fafsaStatus={student.fafsaStatus}
-              scholarships={student.scholarships}
-              financialAidMilestones={student.financialAidMilestones}
+          {/* Status Override Card - Show if override exists */}
+          {student.statusOverride && (
+            <StatusOverrideCard
+              override={student.statusOverride}
+              onRemove={() => {
+                // In a real app, this would update the student data
+                // For now, just alert
+                alert('Override removed');
+              }}
             />
           )}
+        </div>
 
-          {/* Sentiment Alert - Special Handling (Priority 1) */}
-          {student.flags.includes('sentiment') && (
-            <SentimentAlertCard
-              excerpt="Reflection content suggests student may benefit from counselor support"
-              onContactCounselor={() => alert('Contacting counselor for student ' + student.name)}
-              onEscalate={() => alert('Escalating to admin for student ' + student.name)}
-              onDocument={() => alert('Documenting and setting monitoring flag for student ' + student.name)}
-            />
-          )}
+        {/* Main Content Grid: 2 columns on large screens */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* LEFT COLUMN: Curriculum & Academic */}
+          <div className="space-y-6">
+            {/* Ghost Insight Card */}
+            {student && curriculumStatus && (
+              <GhostInsightCard student={student} curriculumStatus={curriculumStatus} />
+            )}
 
-          {/* Flags / Active Items */}
-          <div>
-            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-600">
-              Active Flags
-            </h3>
-            {student.flags.length === 0 ? (
-              <p className="text-sm text-gray-500">No active flags</p>
-            ) : (
-              <div className="space-y-2">
-                {student.flags
-                  .filter(flagType => flagType !== 'sentiment') // Sentiment handled above
-                  .map((flagType) => {
-                    const flag = FLAG_TYPES[flagType];
-                    return (
-                      <Card
-                        key={flagType}
-                        className="bg-amber-50 p-3"
-                      >
-                        <div className="flex items-start gap-2">
-                          <span className="text-lg">{flag.icon}</span>
-                          <div className="flex-1">
-                            <p className="font-semibold text-gray-900">{flag.name}</p>
-                            <p className="text-xs text-gray-700">{flag.description}</p>
-                            {flag.reason && (
-                              <p className="mt-1 text-xs font-medium text-amber-900">
-                                {flag.reason}
-                              </p>
-                            )}
-                          </div>
+            {/* Unit Timeline */}
+            {student && (
+              <UnitTimelineCard units={getStudentUnits(student.id)} />
+            )}
+
+            {/* Academic Data (Counselor only) */}
+            {role === 'counselor' && (
+              <div suppressHydrationWarning>
+                <Card
+                  className={`p-3 text-sm ${
+                    isMounted && isStaleGPA(student.dataDate, new Date())
+                      ? 'bg-amber-50 border-amber-200'
+                      : 'bg-gray-50'
+                  }`}
+                >
+                  <p className="font-semibold text-gray-900">Last Academic Data</p>
+                  <p>GPA: <strong>{student.gpa}</strong></p>
+                  <p>Entered: <strong>{student.dataDate}</strong></p>
+                  {isMounted && (
+                    (() => {
+                      const daysOld = daysSinceDateString(student.dataDate, new Date());
+                      const isStale = isStaleGPA(student.dataDate, new Date());
+                      const ageText = daysOld ? formatDaysAsAge(daysOld) : 'unknown';
+
+                      return isStale && daysOld ? (
+                        <div className="mt-2 rounded bg-amber-100 px-2 py-1">
+                          <p className="text-xs font-semibold text-amber-900">
+                            ⚠️ Data is {ageText}
+                          </p>
+                          <p className="text-xs text-amber-800">
+                            Consider updating GPA to reflect current performance
+                          </p>
                         </div>
-                      </Card>
-                    );
-                  })}
+                      ) : null;
+                    })()
+                  )}
+                </Card>
               </div>
             )}
           </div>
 
-          {/* Academic Data (Counselor only) */}
-          {role === 'counselor' && (
-            <div suppressHydrationWarning>
-              <Card
-                className={`p-3 text-sm ${
-                  isMounted && isStaleGPA(student.dataDate, new Date())
-                    ? 'bg-amber-50 border-amber-200'
-                    : 'bg-gray-50'
-                }`}
-              >
-                <p className="font-semibold text-gray-900">Last Academic Data</p>
-                <p>GPA: <strong>{student.gpa}</strong></p>
-                <p>Entered: <strong>{student.dataDate}</strong></p>
-                {isMounted && (
-                  (() => {
-                    const daysOld = daysSinceDateString(student.dataDate, new Date());
-                    const isStale = isStaleGPA(student.dataDate, new Date());
-                    const ageText = daysOld ? formatDaysAsAge(daysOld) : 'unknown';
+          {/* RIGHT COLUMN: Post-Secondary & Flags */}
+          <div className="space-y-6">
+            {/* College List (for 11th/12th graders) */}
+            {student && (student.grade === 11 || student.grade === 12) && student.collegeList && (
+              <CollegeListCard colleges={student.collegeList} />
+            )}
 
-                    return isStale && daysOld ? (
-                      <div className="mt-2 rounded bg-amber-100 px-2 py-1">
-                        <p className="text-xs font-semibold text-amber-900">
-                          ⚠️ Data is {ageText}
-                        </p>
-                        <p className="text-xs text-amber-800">
-                          Consider updating GPA to reflect current performance
-                        </p>
-                      </div>
-                    ) : null;
-                  })()
-                )}
-              </Card>
+            {/* Alternative Path (for 12th graders pursuing non-college paths) */}
+            {student && student.grade === 12 && student.postSecondaryPath && (
+              <AlternativePathCard path={student.postSecondaryPath} />
+            )}
+
+            {/* Application Status (for 12th graders pursuing college) */}
+            {student && student.grade === 12 && student.applications && (
+              <ApplicationStatusCard applications={student.applications} />
+            )}
+
+            {/* Financial Aid Status (for 12th graders) */}
+            {student && student.grade === 12 && (
+              <FinancialAidCard
+                fafsaStatus={student.fafsaStatus}
+                scholarships={student.scholarships}
+                financialAidMilestones={student.financialAidMilestones}
+              />
+            )}
+
+            {/* Sentiment Alert - Special Handling (Priority 1) */}
+            {student.flags.includes('sentiment') && (
+              <SentimentAlertCard
+                excerpt="Reflection content suggests student may benefit from counselor support"
+                onContactCounselor={() => alert('Contacting counselor for student ' + student.name)}
+                onEscalate={() => alert('Escalating to admin for student ' + student.name)}
+                onDocument={() => alert('Documenting and setting monitoring flag for student ' + student.name)}
+              />
+            )}
+
+            {/* Flags / Active Items (Priority Sorted) */}
+            <div>
+              <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-600">
+                Active Flags
+              </h3>
+              {student.flags.length === 0 ? (
+                <p className="text-sm text-gray-500">No active flags</p>
+              ) : (
+                <div className="space-y-2">
+                  {getSortedFlags(student.flags)
+                    .filter(flagType => flagType !== 'sentiment') // Sentiment handled above (always first in UI)
+                    .map((flagType) => {
+                      const flag = FLAG_TYPES[flagType];
+                      // Color coding by priority
+                      let bgColor = 'bg-amber-50'; // Default
+                      if (flagType === 'deadline') bgColor = 'bg-red-50';
+                      if (flagType === 'revision' || flagType === 'strategy') bgColor = 'bg-blue-50';
+                      if (flagType === 'academic' || flagType === 'staff') bgColor = 'bg-gray-50';
+
+                      return (
+                        <Card
+                          key={flagType}
+                          className={`${bgColor} p-3`}
+                        >
+                          <div className="flex items-start gap-2">
+                            <span className="text-lg">{flag.icon}</span>
+                            <div className="flex-1">
+                              <p className="font-semibold text-gray-900">{flag.name}</p>
+                              <p className="text-xs text-gray-700">{flag.description}</p>
+                              {flag.reason && (
+                                <p className="mt-1 text-xs font-medium text-gray-800">
+                                  {flag.reason}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </Card>
+                      );
+                    })}
+                </div>
+              )}
             </div>
-          )}
+          </div>
+        </div>
 
-          {/* Role-Specific Actions */}
+        {/* Role-Specific Actions (Full Width Below Grid) */}
+        <div className="border-t pt-6">
           {role === 'counselor' && (
-            <div className="space-y-3 border-t pt-4">
+            <div className="space-y-3">
               <div>
                 <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-gray-600">
                   Add Staff Follow-up Flag
@@ -283,45 +346,44 @@ export function DetailPanel({
           )}
 
           {role === 'teacher' && (
-            <div className="space-y-3 border-t pt-4">
+            <div className="space-y-3">
               <div>
                 <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-gray-600">
-                  Grade Current Assignment
+                  Artifact Assessment
                 </label>
-                <Select value={gradeValue} onValueChange={setGradeValue}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a grade..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="a">A (90-100)</SelectItem>
-                    <SelectItem value="b">B (80-89)</SelectItem>
-                    <SelectItem value="c">C (70-79)</SelectItem>
-                    <SelectItem value="d">D (60-69)</SelectItem>
-                    <SelectItem value="f">F (Below 60)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-gray-600">
-                  Feedback
-                </label>
-                <Textarea
-                  placeholder="Add feedback for student..."
-                  value={feedback}
-                  onChange={(e) => setFeedback(e.target.value)}
-                />
+                <p className="mb-3 text-sm text-gray-700">
+                  Review the student's submitted artifact for curriculum quality standards.
+                </p>
               </div>
               <Button
-                onClick={handleSubmitGrade}
-                className="w-full bg-cyan-600 hover:bg-cyan-700"
+                onClick={handleApproveArtifact}
+                className="w-full bg-green-600 hover:bg-green-700"
               >
-                Submit Grade & Feedback
+                ✓ Approve Artifact
               </Button>
+              <div>
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-gray-600">
+                  Flag for Revision
+                </label>
+                <Textarea
+                  placeholder="What needs to be improved? (Be specific about quality standards not met)"
+                  value={revisionReason}
+                  onChange={(e) => setRevisionReason(e.target.value)}
+                  className="mb-2"
+                />
+                <Button
+                  onClick={handleFlagArtifactRevision}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Flag for Revision
+                </Button>
+              </div>
             </div>
           )}
 
           {role === 'admin' && (
-            <div className="space-y-3 border-t pt-4">
+            <div className="space-y-3">
               <div>
                 <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-gray-600">
                   Admin Notes
@@ -373,6 +435,14 @@ export function DetailPanel({
           </Button>
         </div>
       </DialogContent>
+
+      {/* Status Override Modal */}
+      <StatusOverrideModal
+        open={showOverrideModal}
+        onClose={() => setShowOverrideModal(false)}
+        onConfirm={handleOverrideConfirm}
+        studentName={student?.name || 'Student'}
+      />
     </Dialog>
   );
 }

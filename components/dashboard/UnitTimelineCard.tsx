@@ -3,6 +3,7 @@
 import { Unit } from '@/lib/types';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { ArtifactCard } from '@/components/dashboard/ArtifactCard';
 
 interface UnitTimelineCardProps {
   units: Unit[];
@@ -75,34 +76,17 @@ export function UnitTimelineCard({ units }: UnitTimelineCardProps) {
               {unit.status === 'completed' && 'All requirements completed'}
             </p>
 
-            {/* Artifacts Summary */}
+            {/* Artifacts with Quality Feedback */}
             {unit.artifacts && unit.artifacts.length > 0 && (
-              <div className="pt-2">
-                <p className="text-xs font-semibold text-gray-600 mb-1">Artifacts:</p>
-                <div className="space-y-1">
-                  {unit.artifacts.map((artifact) => (
-                    <div
-                      key={artifact.id}
-                      className="flex items-center justify-between rounded bg-white px-2 py-1 text-xs"
-                    >
-                      <div className="flex items-center gap-2 flex-1">
-                        <span>
-                          {artifact.status === 'needed' && '❌'}
-                          {artifact.status === 'submitted' && '📤'}
-                          {artifact.status === 'in-review' && '👁️'}
-                          {artifact.status === 'needs-revision' && '✏️'}
-                          {artifact.status === 'accepted' && '✅'}
-                        </span>
-                        <span className="text-gray-900">{artifact.title}</span>
-                      </div>
-                      {artifact.qualityScore !== undefined && (
-                        <span className="text-gray-600">
-                          {artifact.qualityScore}/100
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
+              <div className="pt-2 space-y-2">
+                <p className="text-xs font-semibold text-gray-600">Artifacts:</p>
+                {unit.artifacts.map((artifact) => (
+                  <ArtifactCard
+                    key={artifact.id}
+                    artifact={artifact}
+                    unitNumber={unit.unitNumber}
+                  />
+                ))}
               </div>
             )}
 

@@ -235,6 +235,59 @@ export const STUDENT_UNITS: Record<number, Unit[]> = {
       ],
     },
   ],
+
+  // Scenario 10: Paper Tiger (Grade 10) - Wrong file upload
+  // Student uploaded History_Homework.pdf instead of Career Pathways Slide Deck
+  15: [
+    {
+      unitNumber: 1,
+      title: 'Self-Awareness Foundations',
+      dueDate: '2024-11-20',
+      status: 'completed',
+      artifacts: [
+        {
+          id: 'A15-U1-1',
+          title: 'Personal Values Statement',
+          status: 'accepted',
+          submittedDate: '2024-11-18',
+          qualityScore: 92,
+        },
+      ],
+    },
+    {
+      unitNumber: 2,
+      title: 'Career Exploration',
+      dueDate: '2024-12-10',
+      status: 'in-progress',
+      artifacts: [
+        {
+          id: 'A15-U2-1',
+          title: 'Career Interest Assessment',
+          status: 'accepted',
+          submittedDate: '2024-12-01',
+          qualityScore: 88,
+        },
+      ],
+    },
+    {
+      unitNumber: 3,
+      title: 'Career Pathways Analysis',
+      dueDate: '2024-04-15',
+      status: 'completed',
+      artifacts: [
+        {
+          id: 'A15-U3-1',
+          title: 'Career Pathways Slide Deck',
+          status: 'needs-revision',
+          submittedDate: '2024-04-10',
+          fileName: 'History_Homework.pdf',
+          qualityScore: 0,
+          feedback: 'File mismatch: Expected a slide deck about career pathways analysis, but received a history assignment. Please upload the correct Career Pathways Slide Deck document.',
+          reason: 'Wrong file uploaded (History_Homework.pdf instead of Career Pathways)',
+        },
+      ],
+    },
+  ],
 };
 
 /**

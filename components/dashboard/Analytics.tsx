@@ -37,7 +37,7 @@ export function Analytics({ cards, title, onFidelityClick, onCurriculumPacingCli
       <h2 className="mb-6 text-lg font-bold text-gray-900">
         {title}
       </h2>
-      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg:grid-cols-4">
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card, idx) => {
           const isFidelity = isFidelityCard(card.label);
           const isPacing = isPacingCard(card.label);

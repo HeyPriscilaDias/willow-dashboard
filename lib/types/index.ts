@@ -67,6 +67,23 @@ export interface Scholarship {
 // FAFSA status type
 export type FAFSAStatus = 'not-started' | 'in-progress' | 'submitted' | 'processed';
 
+// Post-secondary path types for alternative routes (apprenticeships, trades, etc)
+export type PostSecondaryPathType = 'college' | 'apprenticeship' | 'trade-school' | 'military' | 'gap-year' | 'work';
+
+export interface PostSecondaryPath {
+  type: PostSecondaryPathType;
+  program?: string; // Name of program (e.g., "IBEW Electrician Apprenticeship")
+  status: 'interested' | 'applied' | 'accepted' | 'enrolled'; // Status of enrollment
+}
+
+// Status override data for manual interventions
+export interface StatusOverride {
+  reason: string;
+  setBy?: string; // Name of counselor who set override
+  setDate?: string; // Date override was set
+  expiresDate?: string; // Optional expiration date
+}
+
 // Financial aid milestone for deadline tracking
 export interface FinancialAidMilestone {
   type: 'fafsa-submission' | 'fafsa-processing' | 'award-comparison';
@@ -93,6 +110,8 @@ export interface Student {
   fafsaStatus?: FAFSAStatus; // FAFSA application status for 12th graders
   scholarships?: Scholarship[]; // Awarded scholarships and aid packages for 12th graders
   financialAidMilestones?: FinancialAidMilestone[]; // Critical deadlines (FAFSA, award comparison)
+  postSecondaryPath?: PostSecondaryPath; // Alternative post-secondary path (apprenticeship, trade, military, gap year, work) for 12th graders
+  statusOverride?: StatusOverride; // Manual status override with reason (visible to all staff)
 }
 
 export interface AnalyticsCard {

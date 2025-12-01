@@ -253,5 +253,58 @@ export const STUDENTS: Student[] = [
     assignmentStatus: 'Submitted',
     teacherConcern: false,
     class: 'Period 2'
+  },
+  {
+    id: 15,
+    name: 'Casey Lin',
+    grade: 10,
+    status: 'off-track',
+    flags: ['revision'],
+    lastActivity: '2024-04-10',
+    gpa: 3.8,
+    dataDate: 'Apr 5, 2024',
+    statusReason: 'Status is Off Track because of: Artifact requires revision (wrong file uploaded)',
+    assignmentStatus: 'Submitted',
+    teacherConcern: false,
+    class: 'Period 3'
+  },
+  {
+    id: 16,
+    name: 'Jordan Brooks',
+    grade: 12,
+    status: 'on-track',
+    flags: ['strategy'],
+    lastActivity: '2024-11-01',
+    gpa: 2.4,
+    dataDate: 'Nov 1, 2024',
+    statusReason: 'Status is On Track because of: Alternative path (apprenticeship) logged and in progress',
+    assignmentStatus: 'Submitted',
+    teacherConcern: false,
+    class: 'Period 1',
+    postSecondaryPath: {
+      type: 'apprenticeship',
+      program: 'IBEW Local 134 Electrician Apprenticeship',
+      status: 'accepted'
+    }
+  },
+  {
+    id: 17,
+    name: 'Alex Patterson',
+    grade: 11,
+    status: 'on-track',
+    flags: ['staff'],
+    lastActivity: '2024-10-15',
+    gpa: 1.2,
+    dataDate: 'Oct 10, 2024',
+    statusReason: 'Status is On Track (Manual Override): Exempt from Resume Unit until Nov 1 due to work schedule',
+    assignmentStatus: 'Missing',
+    teacherConcern: false,
+    class: 'Period 2',
+    statusOverride: {
+      reason: 'Exempt from Resume Unit until Nov 1 due to work schedule',
+      setBy: 'Sarah Smith',
+      setDate: 'Oct 15, 2024',
+      expiresDate: 'Nov 1, 2024'
+    }
   }
 ];

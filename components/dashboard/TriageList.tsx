@@ -312,7 +312,7 @@ export function TriageList({ students, curriculumStats, onSelectStudent, title }
                       size="sm"
                       className="bg-cyan-600 hover:bg-cyan-700"
                     >
-                      {role === 'teacher' ? 'Grade' : 'Review'}
+                      {role === 'teacher' ? 'Assess Artifact' : 'Review'}
                     </Button>
                   </TableCell>
                 </TableRow>
