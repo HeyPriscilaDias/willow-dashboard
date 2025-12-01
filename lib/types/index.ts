@@ -54,6 +54,27 @@ export interface Application {
   decisionType?: 'early-decision' | 'early-action' | 'regular'; // Application type
 }
 
+// Scholarship interface for financial aid tracking
+export interface Scholarship {
+  id: string;
+  name: string;
+  amount: number; // Dollar amount
+  source: 'university' | 'external' | 'grant' | 'loan'; // Type of funding
+  awardedDate?: string; // ISO date when award was made
+  acceptanceDeadline?: string; // ISO date when student must respond by (typically May 1)
+}
+
+// FAFSA status type
+export type FAFSAStatus = 'not-started' | 'in-progress' | 'submitted' | 'processed';
+
+// Financial aid milestone for deadline tracking
+export interface FinancialAidMilestone {
+  type: 'fafsa-submission' | 'fafsa-processing' | 'award-comparison';
+  dueDate: string; // ISO date
+  status: 'pending' | 'approaching' | 'due-soon' | 'overdue' | 'completed';
+  isUrgent: boolean; // True if < 7 days away or overdue
+}
+
 export interface Student {
   id: number;
   name: string;
@@ -69,6 +90,9 @@ export interface Student {
   class: string;
   collegeList?: College[]; // Post-secondary planning for 11th/12th graders
   applications?: Application[]; // College application tracking for 12th graders
+  fafsaStatus?: FAFSAStatus; // FAFSA application status for 12th graders
+  scholarships?: Scholarship[]; // Awarded scholarships and aid packages for 12th graders
+  financialAidMilestones?: FinancialAidMilestone[]; // Critical deadlines (FAFSA, award comparison)
 }
 
 export interface AnalyticsCard {

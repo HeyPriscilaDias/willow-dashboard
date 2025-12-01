@@ -1,6 +1,7 @@
 import { Student, Flag } from '@/lib/types';
 import { STUDENT_COLLEGES } from '@/lib/data/studentColleges';
 import { STUDENT_APPLICATIONS } from '@/lib/data/studentApplications';
+import { STUDENT_FINANCIAL_AID } from '@/lib/data/studentFinancialAid';
 
 export const FLAG_TYPES: Record<string, Flag> = {
   revision: {
@@ -84,7 +85,10 @@ export const STUDENTS: Student[] = [
     teacherConcern: true,
     class: 'Period 1',
     collegeList: STUDENT_COLLEGES[3], // Scenario 3: Ivy League Risk (all reach schools)
-    applications: STUDENT_APPLICATIONS[3] // All 8 applications submitted, waiting for decisions
+    applications: STUDENT_APPLICATIONS[3], // All 8 applications submitted, waiting for decisions
+    fafsaStatus: STUDENT_FINANCIAL_AID[3].fafsaStatus,
+    scholarships: STUDENT_FINANCIAL_AID[3].scholarships,
+    financialAidMilestones: STUDENT_FINANCIAL_AID[3].financialAidMilestones
   },
   {
     id: 4,
@@ -142,7 +146,10 @@ export const STUDENTS: Student[] = [
     teacherConcern: false,
     class: 'Period 1',
     collegeList: STUDENT_COLLEGES[7], // Good balance example
-    applications: STUDENT_APPLICATIONS[7] // 5 applications, 3 acceptances received
+    applications: STUDENT_APPLICATIONS[7], // 5 applications, 3 acceptances received
+    fafsaStatus: STUDENT_FINANCIAL_AID[7].fafsaStatus,
+    scholarships: STUDENT_FINANCIAL_AID[7].scholarships,
+    financialAidMilestones: STUDENT_FINANCIAL_AID[7].financialAidMilestones
   },
   {
     id: 8,
@@ -214,7 +221,10 @@ export const STUDENTS: Student[] = [
     teacherConcern: false,
     class: 'Period 3',
     collegeList: STUDENT_COLLEGES[12], // Another balanced example
-    applications: STUDENT_APPLICATIONS[12] // All 6 UC applications just submitted
+    applications: STUDENT_APPLICATIONS[12], // All 6 UC applications just submitted
+    fafsaStatus: STUDENT_FINANCIAL_AID[12].fafsaStatus,
+    scholarships: STUDENT_FINANCIAL_AID[12].scholarships,
+    financialAidMilestones: STUDENT_FINANCIAL_AID[12].financialAidMilestones
   },
   {
     id: 13,

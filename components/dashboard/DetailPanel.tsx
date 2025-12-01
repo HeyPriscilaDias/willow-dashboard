@@ -28,6 +28,7 @@ import { UnitTimelineCard } from '@/components/dashboard/UnitTimelineCard';
 import { SentimentAlertCard } from '@/components/dashboard/SentimentAlertCard';
 import { CollegeListCard } from '@/components/dashboard/CollegeListCard';
 import { ApplicationStatusCard } from '@/components/dashboard/ApplicationStatusCard';
+import { FinancialAidCard } from '@/components/dashboard/FinancialAidCard';
 
 interface DetailPanelProps {
   student: Student | null;
@@ -158,6 +159,15 @@ export function DetailPanel({
           {/* Application Status (for 12th graders) */}
           {student && student.grade === 12 && student.applications && (
             <ApplicationStatusCard applications={student.applications} />
+          )}
+
+          {/* Financial Aid Status (for 12th graders) */}
+          {student && student.grade === 12 && (
+            <FinancialAidCard
+              fafsaStatus={student.fafsaStatus}
+              scholarships={student.scholarships}
+              financialAidMilestones={student.financialAidMilestones}
+            />
           )}
 
           {/* Sentiment Alert - Special Handling (Priority 1) */}
