@@ -44,6 +44,16 @@ export interface College {
   decisionDate?: string; // ISO date when decision received
 }
 
+// Application interface for tracking college applications separately
+export interface Application {
+  id: string;
+  schoolName: string;
+  submittedDate: string; // ISO date when student submitted application
+  status: 'submitted' | 'pending' | 'accepted' | 'rejected' | 'waitlisted';
+  decisionDate?: string; // ISO date when decision received
+  decisionType?: 'early-decision' | 'early-action' | 'regular'; // Application type
+}
+
 export interface Student {
   id: number;
   name: string;
@@ -58,6 +68,7 @@ export interface Student {
   teacherConcern: boolean;
   class: string;
   collegeList?: College[]; // Post-secondary planning for 11th/12th graders
+  applications?: Application[]; // College application tracking for 12th graders
 }
 
 export interface AnalyticsCard {

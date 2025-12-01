@@ -27,6 +27,7 @@ import { GhostInsightCard } from '@/components/dashboard/GhostInsightCard';
 import { UnitTimelineCard } from '@/components/dashboard/UnitTimelineCard';
 import { SentimentAlertCard } from '@/components/dashboard/SentimentAlertCard';
 import { CollegeListCard } from '@/components/dashboard/CollegeListCard';
+import { ApplicationStatusCard } from '@/components/dashboard/ApplicationStatusCard';
 
 interface DetailPanelProps {
   student: Student | null;
@@ -152,6 +153,11 @@ export function DetailPanel({
           {/* College List (for 11th/12th graders) */}
           {student && (student.grade === 11 || student.grade === 12) && student.collegeList && (
             <CollegeListCard colleges={student.collegeList} />
+          )}
+
+          {/* Application Status (for 12th graders) */}
+          {student && student.grade === 12 && student.applications && (
+            <ApplicationStatusCard applications={student.applications} />
           )}
 
           {/* Sentiment Alert - Special Handling (Priority 1) */}
