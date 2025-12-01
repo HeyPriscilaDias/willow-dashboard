@@ -33,6 +33,17 @@ export interface Unit {
   artifacts: Artifact[];
 }
 
+// College interface for post-secondary planning
+export interface College {
+  id: string;
+  name: string;
+  acceptanceRate: number; // 0-100
+  type: 'reach' | 'target' | 'safety'; // Determined by acceptance rate or manual entry
+  appliedStatus: 'interested' | 'applied' | 'accepted' | 'rejected' | 'waitlisted';
+  appliedDate?: string; // ISO date when student applied
+  decisionDate?: string; // ISO date when decision received
+}
+
 export interface Student {
   id: number;
   name: string;
@@ -46,6 +57,7 @@ export interface Student {
   assignmentStatus: 'Submitted' | 'Missing';
   teacherConcern: boolean;
   class: string;
+  collegeList?: College[]; // Post-secondary planning for 11th/12th graders
 }
 
 export interface AnalyticsCard {

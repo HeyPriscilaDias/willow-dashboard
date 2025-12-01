@@ -1,4 +1,5 @@
 import { Student, Flag } from '@/lib/types';
+import { STUDENT_COLLEGES } from '@/lib/data/studentColleges';
 
 export const FLAG_TYPES: Record<string, Flag> = {
   revision: {
@@ -80,7 +81,8 @@ export const STUDENTS: Student[] = [
     statusReason: 'Status is Off Track because of: Low GPA and missing college prep activities',
     assignmentStatus: 'Missing',
     teacherConcern: true,
-    class: 'Period 1'
+    class: 'Period 1',
+    collegeList: STUDENT_COLLEGES[3] // Scenario 3: Ivy League Risk (all reach schools)
   },
   {
     id: 4,
@@ -136,7 +138,8 @@ export const STUDENTS: Student[] = [
     statusReason: 'Status is On Track because: On track for graduation with career plan',
     assignmentStatus: 'Submitted',
     teacherConcern: false,
-    class: 'Period 1'
+    class: 'Period 1',
+    collegeList: STUDENT_COLLEGES[7] // Good balance example
   },
   {
     id: 8,
@@ -206,7 +209,8 @@ export const STUDENTS: Student[] = [
     statusReason: 'Status is On Track because: Strong curriculum completion and career planning progress',
     assignmentStatus: 'Submitted',
     teacherConcern: false,
-    class: 'Period 3'
+    class: 'Period 3',
+    collegeList: STUDENT_COLLEGES[12] // Another balanced example
   },
   {
     id: 13,

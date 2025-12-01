@@ -26,6 +26,7 @@ import { Card } from '@/components/ui/card';
 import { GhostInsightCard } from '@/components/dashboard/GhostInsightCard';
 import { UnitTimelineCard } from '@/components/dashboard/UnitTimelineCard';
 import { SentimentAlertCard } from '@/components/dashboard/SentimentAlertCard';
+import { CollegeListCard } from '@/components/dashboard/CollegeListCard';
 
 interface DetailPanelProps {
   student: Student | null;
@@ -146,6 +147,11 @@ export function DetailPanel({
           {/* Unit Timeline */}
           {student && (
             <UnitTimelineCard units={getStudentUnits(student.id)} />
+          )}
+
+          {/* College List (for 11th/12th graders) */}
+          {student && (student.grade === 11 || student.grade === 12) && student.collegeList && (
+            <CollegeListCard colleges={student.collegeList} />
           )}
 
           {/* Sentiment Alert - Special Handling (Priority 1) */}
