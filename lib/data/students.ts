@@ -1,12 +1,42 @@
 import { Student, Flag } from '@/lib/types';
 
 export const FLAG_TYPES: Record<string, Flag> = {
-  revision: { icon: '', name: 'Needs Revision', description: 'Artifact requires revision' },
-  deadline: { icon: '', name: 'Missed Deadline', description: 'Assignment deadline has passed' },
-  strategy: { icon: '', name: 'Strategy Risk', description: 'Post-secondary strategy needs review' },
-  sentiment: { icon: '', name: 'Sentiment Alert', description: 'Concerning sentiment detected' },
-  academic: { icon: '', name: 'Academic Warning', description: 'Academic performance concern' },
-  staff: { icon: '', name: 'Staff Follow-up', description: 'Requires staff attention' }
+  revision: {
+    icon: '✏️',
+    name: 'Needs Revision',
+    description: 'Artifact requires revision',
+    reason: 'Quality/Content issue detected'
+  },
+  deadline: {
+    icon: '⏰',
+    name: 'Missed Deadline',
+    description: 'Assignment deadline has passed',
+    reason: 'Overdue submission required'
+  },
+  strategy: {
+    icon: '🎯',
+    name: 'Strategy Risk',
+    description: 'Post-secondary strategy needs review',
+    reason: 'Plan may not meet post-secondary goals'
+  },
+  sentiment: {
+    icon: '🚨',
+    name: 'Sentiment Alert',
+    description: 'Concerning sentiment detected',
+    reason: 'Safety concern requiring immediate attention'
+  },
+  academic: {
+    icon: '📚',
+    name: 'Academic Warning',
+    description: 'Academic performance concern',
+    reason: 'GPA or academic data needs attention'
+  },
+  staff: {
+    icon: '👤',
+    name: 'Staff Follow-up',
+    description: 'Requires staff attention',
+    reason: 'Manual note added by staff'
+  }
 };
 
 export const STUDENTS: Student[] = [

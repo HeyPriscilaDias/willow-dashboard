@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Student, FlagType, CurriculumStatus } from '@/lib/types';
 import { useRole } from '@/lib/context/RoleContext';
 import {
@@ -38,6 +38,12 @@ export function TriageList({ students, curriculumStats, onSelectStudent, title }
   const [flagFilter, setFlagFilter] = useState('all');
   const [curriculumFilter, setCurriculumFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Only render dates after client mount to avoid hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Get unique classes from students
   const uniqueClasses = Array.from(new Set(students.map(s => s.class))).sort();
@@ -297,8 +303,8 @@ export function TriageList({ students, curriculumStats, onSelectStudent, title }
                       <span className="text-xs text-gray-500">None</span>
                     )}
                   </TableCell>
-                  <TableCell className="text-xs text-gray-600">
-                    {role === 'teacher' ? student.assignmentStatus : formatDate(student.lastActivity)}
+                  <TableCell className="text-xs text-gray-600" suppressHydrationWarning>
+                    {role === 'teacher' ? student.assignmentStatus : (isMounted ? formatDate(student.lastActivity) : '-')}
                   </TableCell>
                   <TableCell>
                     <Button

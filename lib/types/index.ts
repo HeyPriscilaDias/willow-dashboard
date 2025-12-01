@@ -8,6 +8,29 @@ export interface Flag {
   icon: string;
   name: string;
   description: string;
+  reason?: string; // Granular reason for flag (e.g., "Too short (1 sentence, need 2-3 paragraphs)")
+}
+
+// Artifact interface for detailed submission tracking
+export interface Artifact {
+  id: string;
+  title: string;
+  status: 'needed' | 'submitted' | 'in-review' | 'needs-revision' | 'accepted';
+  submittedDate?: string;
+  fileName?: string;
+  qualityScore?: number; // 0-100
+  feedback?: string; // Specific feedback on what needs fixing
+  reason?: string; // For "Needs Revision" - e.g., "Too short", "Wrong file", "Low quality"
+}
+
+// Unit interface for curriculum tracking
+export interface Unit {
+  unitNumber: number;
+  title: string;
+  dueDate: string; // ISO date format (YYYY-MM-DD)
+  status: 'not-started' | 'in-progress' | 'overdue' | 'completed';
+  daysSinceOverdue?: number; // Only set if status === 'overdue'
+  artifacts: Artifact[];
 }
 
 export interface Student {
@@ -75,6 +98,7 @@ export interface CurriculumStatus {
   totalLessonsForGrade: number;
   isGhost: boolean;
   ghostReason: string;
+  units?: Unit[]; // Unit-by-unit curriculum timeline data
 }
 
 export interface GradePacingAggregate {

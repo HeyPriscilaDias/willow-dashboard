@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Student, CurriculumStatus } from '@/lib/types';
 import { useRole } from '@/lib/context/RoleContext';
 import { FLAG_TYPES } from '@/lib/data/students';
+import { getStudentUnits } from '@/lib/data/studentUnits';
+import { daysSinceDateString, isStaleGPA, formatDaysAsAge } from '@/lib/utils/dateUtils';
 import {
   Dialog,
   DialogContent,
@@ -22,6 +24,8 @@ import {
 } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import { GhostInsightCard } from '@/components/dashboard/GhostInsightCard';
+import { UnitTimelineCard } from '@/components/dashboard/UnitTimelineCard';
+import { SentimentAlertCard } from '@/components/dashboard/SentimentAlertCard';
 
 interface DetailPanelProps {
   student: Student | null;
@@ -50,6 +54,12 @@ export function DetailPanel({
   const [feedback, setFeedback] = useState('');
   const [adminNote, setAdminNote] = useState('');
   const [escalateCounselor, setEscalateCounselor] = useState('');
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Only render date-dependent content after client mount
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   if (!student) return null;
 
@@ -91,7 +101,7 @@ export function DetailPanel({
 
   return (
     <Dialog open={student !== null} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent suppressHydrationWarning className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="mb-4">
             <DialogTitle className="text-2xl font-bold text-gray-900">
@@ -133,6 +143,21 @@ export function DetailPanel({
             <GhostInsightCard student={student} curriculumStatus={curriculumStatus} />
           )}
 
+          {/* Unit Timeline */}
+          {student && (
+            <UnitTimelineCard units={getStudentUnits(student.id)} />
+          )}
+
+          {/* Sentiment Alert - Special Handling (Priority 1) */}
+          {student.flags.includes('sentiment') && (
+            <SentimentAlertCard
+              excerpt="Reflection content suggests student may benefit from counselor support"
+              onContactCounselor={() => alert('Contacting counselor for student ' + student.name)}
+              onEscalate={() => alert('Escalating to admin for student ' + student.name)}
+              onDocument={() => alert('Documenting and setting monitoring flag for student ' + student.name)}
+            />
+          )}
+
           {/* Flags / Active Items */}
           <div>
             <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-600">
@@ -142,34 +167,65 @@ export function DetailPanel({
               <p className="text-sm text-gray-500">No active flags</p>
             ) : (
               <div className="space-y-2">
-                {student.flags.map((flagType) => {
-                  const flag = FLAG_TYPES[flagType];
-                  return (
-                    <Card
-                      key={flagType}
-                      className="bg-amber-50 p-3"
-                    >
-                      <div className="flex items-start gap-2">
-                        <span className="text-lg">{flag.icon}</span>
-                        <div className="flex-1">
-                          <p className="font-semibold text-gray-900">{flag.name}</p>
-                          <p className="text-xs text-gray-700">{flag.description}</p>
+                {student.flags
+                  .filter(flagType => flagType !== 'sentiment') // Sentiment handled above
+                  .map((flagType) => {
+                    const flag = FLAG_TYPES[flagType];
+                    return (
+                      <Card
+                        key={flagType}
+                        className="bg-amber-50 p-3"
+                      >
+                        <div className="flex items-start gap-2">
+                          <span className="text-lg">{flag.icon}</span>
+                          <div className="flex-1">
+                            <p className="font-semibold text-gray-900">{flag.name}</p>
+                            <p className="text-xs text-gray-700">{flag.description}</p>
+                            {flag.reason && (
+                              <p className="mt-1 text-xs font-medium text-amber-900">
+                                {flag.reason}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    </Card>
-                  );
-                })}
+                      </Card>
+                    );
+                  })}
               </div>
             )}
           </div>
 
           {/* Academic Data (Counselor only) */}
           {role === 'counselor' && (
-            <div>
-              <Card className="bg-gray-50 p-3 text-sm">
+            <div suppressHydrationWarning>
+              <Card
+                className={`p-3 text-sm ${
+                  isMounted && isStaleGPA(student.dataDate, new Date())
+                    ? 'bg-amber-50 border-amber-200'
+                    : 'bg-gray-50'
+                }`}
+              >
                 <p className="font-semibold text-gray-900">Last Academic Data</p>
                 <p>GPA: <strong>{student.gpa}</strong></p>
                 <p>Entered: <strong>{student.dataDate}</strong></p>
+                {isMounted && (
+                  (() => {
+                    const daysOld = daysSinceDateString(student.dataDate, new Date());
+                    const isStale = isStaleGPA(student.dataDate, new Date());
+                    const ageText = daysOld ? formatDaysAsAge(daysOld) : 'unknown';
+
+                    return isStale && daysOld ? (
+                      <div className="mt-2 rounded bg-amber-100 px-2 py-1">
+                        <p className="text-xs font-semibold text-amber-900">
+                          ⚠️ Data is {ageText}
+                        </p>
+                        <p className="text-xs text-amber-800">
+                          Consider updating GPA to reflect current performance
+                        </p>
+                      </div>
+                    ) : null;
+                  })()
+                )}
               </Card>
             </div>
           )}
